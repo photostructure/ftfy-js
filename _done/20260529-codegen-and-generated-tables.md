@@ -34,7 +34,7 @@ codegen verified deterministic (identical md5 across runs); `tsc -p tsconfig.bui
 
 ## What was built
 
-Scripts (all run via `python3 scripts/gen_all.py`, also wired to `npm run gen`):
+Scripts (all run via `uv run scripts/gen_all.py` / `npm run gen`):
 
 | Script                       | Output                   | Exports                                                                                                 |
 | ---------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------- |
@@ -51,14 +51,33 @@ negative,known-failures,language-names}.json` + `README.md` + `tests/face.txt`.
 
 ## Environment / running the codegen
 
-- The codegen imports `ftfy` from the sibling `../python-ftfy` checkout (override with
-  `FTFY_PYTHON_SRC`). ftfy needs `wcwidth`, which is **not** installable system-wide here
-  (PEP 668 / no `python3-venv`). It is vendored into `.pyenv/` at the repo root
-  (`python3 -m pip install --target .pyenv wcwidth`) and `.pyenv/` is gitignored.
-  `_gen_common._setup_sys_path()` puts `.pyenv` + `../python-ftfy` on `sys.path`.
-- **CI note:** the no-diff check must reproduce this env (checkout python-ftfy at the pinned
-  SHA, `pip install --target .pyenv wcwidth`, then `python3 scripts/gen_all.py` and assert a
-  clean tree). The GitHub Actions wiring is not part of this TPP — note it for whoever owns CI.
+- **Runner: `uv` (recommended).** Each runnable script carries PEP 723 metadata
+  (`requires-python = "==3.12.*"`, `dependencies = ["wcwidth"]`). `npm run gen`
+  (= `uv run scripts/gen_all.py`) provisions wcwidth and **pins Python 3.12** with zero setup.
+  The codegen imports `ftfy` from the sibling `../python-ftfy` checkout (override with
+  `FTFY_PYTHON_SRC`); `_gen_common._setup_sys_path()` puts it (and a `.pyenv/` fallback, if
+  present) on `sys.path`.
+- **Why pin Python 3.12:** CPython bundles a fixed `unicodedata` per minor version
+  (3.12 → unidata 15.0.0, 3.13 → 15.1.0). Running on a different Python silently changes the
+  name/category tables. `_gen_common.check_unidata_version()` is a belt-and-suspenders guard:
+  it aborts unless `unidata_version == "15.0.0"` (override with `FTFY_ALLOW_UNIDATA_DRIFT=1`
+  for an intentional bump — then update `EXPECTED_UNIDATA_VERSION` + the file headers).
+  Verified: `uv run --python 3.13 …` trips the guard (refuses to emit 15.1.0 tables).
+- **Bare `python3` fallback** (no uv): vendor wcwidth into `.pyenv/`
+  (`pip install --target .pyenv wcwidth`; `.pyenv/` is gitignored) and run
+  `python3 scripts/gen_all.py`. The drift guard still protects you if that Python ≠ 3.12.
+- **No-diff guard:** `npm run gen:check` = regen + `git diff --exit-code` over `src/generated`,
+  `tests/test-cases`, `tests/face.txt`. Wired into `npm run all` (the release-gated
+  validation: `ncu → gen:check → fmt → build → lint → test`). Catches hand-edits, un-run
+  generator changes, and upstream-SHA bumps. (Note: `git diff` ignores _untracked_ files, so it
+  only bites once the generated files are committed.) Since ftfy is stable (v6.3.1, ~3 yrs),
+  this is almost always a no-op — but it's cheap insurance and the natural home for the no-diff
+  check. A standalone GitHub Actions job (setup-uv → `npm run gen:check`) is still worth adding
+  for whoever owns CI.
+- **Python formatting/lint:** `scripts/` is formatted and linted with `ruff` (what upstream
+  uses) via `uvx ruff@0.14.4` at line-length 100, folded into `npm run fmt` / `fmt:check` /
+  `lint`. Generated TS is `.prettierignore`d (codegen is the source of truth), so prettier and
+  the no-diff guard never fight.
 
 ## Lore (read before touching the generators or their consumers)
 
