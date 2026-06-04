@@ -8,3 +8,7 @@ __pycache__/
 node_modules/
 dist/
 *.tsbuildinfo
+
+# Per-developer Claude Code local config (permissions, working dirs).
+# The shared .claude/settings.json and .claude/skills/ stay tracked.
+.claude/settings.local.json
