@@ -23,8 +23,9 @@ edge-case. The upstream `ftfy/` is the spec; upstream `tests/` are the acceptanc
 - **snake_case public API.** Preserve Python names that are part of the API (`fix_text`,
   `fix_and_explain`, `fix_encoding`, `fix_encoding_and_explain`, `fix_text_segment`,
   `fix_file`, `guess_bytes`, `apply_plan`, `explain_unicode`, `TextFixerConfig`,
-  `ExplanationStep`, `ExplainedText`, `__version__`) and keep snake_case config keys. Add
-  idiomatic camelCase aliases only where they don't obscure parity.
+  `ExplanationStep`, `ExplainedText`, `__version__`) and keep snake_case config keys. The
+  public API is **snake_case only — no camelCase aliases.** Internal/private helpers with no
+  public Python counterpart (e.g. `bytesToBinary`, `makeConfig`) may use idiomatic camelCase.
 
 ## The fixers
 
@@ -46,7 +47,7 @@ accepts). Inside the encoding-fix step, convert to a **binary string** (one char
 pass these internal binary strings to Unicode-normalization or codepoint helpers.
 
 **Strict decode is the control-flow backbone.** `_fix_encoding_one_step_and_explain` relies
-on `bytes.decode("utf-8")` *throwing* to reject candidate encodings. `decode(...)` must throw
+on `bytes.decode("utf-8")` _throwing_ to reject candidate encodings. `decode(...)` must throw
 `DecodeError` on any malformed/truncated/overlong/surrogate input. Never use a silent-`�`
 mode in the fix loop. Only `test_russian_crash` uses an explicit `"replace"` mode.
 
@@ -64,7 +65,8 @@ UTF-8 step machine in `utf8.ts`, then port `_buffer_decode` / `_buffer_decode_st
 and expects identical output).
 
 **Codegen tables.** `scripts/gen_*.py` emit:
-- `charmaps.ts`: 256-entry decode tables — sloppy-* (Latin-1 base, overlay real decode where
+
+- `charmaps.ts`: 256-entry decode tables — sloppy-\* (Latin-1 base, overlay real decode where
   `!=U+FFFD`, force `0x1A→U+FFFD`), real `windows-1252` (`null` at holes
   0x81/8D/8F/90/9D), hole-free `latin-1`/`iso-8859-2`/`macroman`/`cp437`, plus the rest of
   `INCOMPLETE_ENCODINGS` for `fix_file -e`. `charmap.ts` builds the encode map by iterating
@@ -134,7 +136,7 @@ database, so a faithful, full-parity implementation needs a generated names tabl
 
 - `fix_surrogates` regexes: **no `u` flag** (match lone surrogate code units);
   `convert_surrogate_pair` uses `charCodeAt`.
-- `possibleEncoding` anchoring: patterns are `^...*$`; `\n` is inside the class, so the only
+- `possible_encoding` anchoring: patterns are `^...*$`; `\n` is inside the class, so the only
   Python-vs-JS `$` difference is a trailing newline (Python `$` also matches before a final
   `\n`). Mirror `test_possible_encoding` (all 256 chars in latin-1) and add a `"x\n"` case.
 - `fix_text` segmentation: split on `\n` (common path); cap by code units but never split a

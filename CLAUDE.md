@@ -53,8 +53,9 @@ and next steps across sessions. See [docs/TPP-GUIDE.md](docs/TPP-GUIDE.md).
   `src/generated/` (byte-identical to Python). Do **not** hand-edit generated files.
 - **Public compatibility:** preserve Python names that are part of the API
   (`fix_text`, `fix_and_explain`, `guess_bytes`, `apply_plan`, `TextFixerConfig`,
-  `ExplanationStep`, `ExplainedText`, `__version__`). Keep snake_case config keys;
-  add idiomatic aliases only when they do not obscure parity.
+  `ExplanationStep`, `ExplainedText`, `__version__`). Keep snake_case config keys. The
+  public API is **snake_case only — no camelCase aliases**; internal helpers with no public
+  Python counterpart may use idiomatic camelCase.
 - **License:** `Apache-2.0`. README, package.json, `NOTICE`, and `src/index.ts`
   must credit python-ftfy and Robyn Speer and link the upstream repo.
 
@@ -66,7 +67,7 @@ src/
   config.ts        TextFixerConfig, Explanation types, FIXERS, makeConfig, replace
   fixes.ts        ← ftfy/fixes.py       (12 FIXERS + fix_encoding step; byte-fixers on binary strings)
   chardata.ts     ← ftfy/chardata.py    (regexes, maps, clues, html.unescape consumer)
-  badness.ts      ← ftfy/badness.py     (BADNESS_RE, isBad, badness)
+  badness.ts      ← ftfy/badness.py     (BADNESS_RE, is_bad, badness)
   formatting.ts   ← ftfy/formatting.py  (display width; ported wcwidth)
   html-entities.ts CPython html/__init__.py unescape() + generated html5 dict
   cli.ts / bin.ts ← ftfy/cli.py         (hand-rolled argparse clone; exact error texts/exit codes)

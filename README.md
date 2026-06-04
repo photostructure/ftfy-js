@@ -1,15 +1,15 @@
 # @photostructure/ftfy
 
-**ftfy** ("fixes text for you") repairs mojibake and other Unicode glitches *after the
-fact* — the garbled text you get when bytes were decoded with the wrong encoding, when
+**ftfy** ("fixes text for you") repairs mojibake and other Unicode glitches _after the
+fact_ — the garbled text you get when bytes were decoded with the wrong encoding, when
 HTML entities were left unescaped, when curly quotes and ligatures crept in, and so on.
 
 ```ts
 import { fix_text } from "@photostructure/ftfy";
 
-fix_text("âœ” No problems");          // → "✔ No problems"
-fix_text("&macr;\\_(ã\x83\x84)_/&macr;");  // → "¯\_(ツ)_/¯"
-fix_text("Ã©tÃ©");                     // → "été"
+fix_text("âœ” No problems"); // → "✔ No problems"
+fix_text("&macr;\\_(ã\x83\x84)_/&macr;"); // → "¯\_(ツ)_/¯"
+fix_text("Ã©tÃ©"); // → "été"
 ```
 
 ## A faithful port of python-ftfy
@@ -54,14 +54,14 @@ The public API mirrors python-ftfy, including its `snake_case` names:
 
 ```ts
 import {
-  fix_text,            // the main entry point
-  fix_and_explain,     // → { text, explanation } so you can see/replay each step
-  fix_encoding,        // just the encoding-repair step
-  apply_plan,          // replay an explanation onto the original text
-  guess_bytes,         // best-effort decode of unknown bytes
-  fix_file,            // fix a stream/file line by line
-  TextFixerConfig,     // per-call options (snake_case keys)
-  __version__,         // "6.3.1" — the upstream version this mirrors
+  fix_text, // the main entry point
+  fix_and_explain, // → { text, explanation } so you can see/replay each step
+  fix_encoding, // just the encoding-repair step
+  apply_plan, // replay an explanation onto the original text
+  guess_bytes, // best-effort decode of unknown bytes
+  fix_file, // fix a stream/file line by line
+  TextFixerConfig, // per-call options (snake_case keys)
+  __version__, // "6.3.1" — the upstream version this mirrors
 } from "@photostructure/ftfy";
 ```
 
