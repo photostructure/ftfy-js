@@ -24,9 +24,9 @@ Define `TextFixerConfig`, the Explanation data model, the `FIXERS` registry, `ma
 - [CLAUDE.md](../CLAUDE.md) — locked decisions, build/test commands
 - [docs/TPP-GUIDE.md](../docs/TPP-GUIDE.md) — workflow
 - [docs/DESIGN.md](../docs/DESIGN.md) — "Data model", "The fixers", "Import cycle"
-- `../python-ftfy/ftfy/__init__.py:78-246` — FIXERS, TextFixerConfig (16-field
+- `python-ftfy/ftfy/__init__.py:78-246` — FIXERS, TextFixerConfig (16-field
   NamedTuple), `_config_from_kwargs`
-- `../python-ftfy/tests/test_entities.py` — `test_old_parameter_name` (the deprecation acceptance test)
+- `python-ftfy/tests/test_entities.py` — `test_old_parameter_name` (the deprecation acceptance test)
 
 ## Lore
 

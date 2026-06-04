@@ -1,0 +1,4 @@
+[submodule "python-ftfy"]
+	path = python-ftfy
+	url = https://github.com/rspeer/python-ftfy.git
+	branch = main

@@ -26,7 +26,7 @@ to `src/generated/wcwidth-tables.ts`. **Public names are snake_case; no camelCas
 - [CLAUDE.md](../CLAUDE.md) — locked decisions, build/test commands
 - [docs/TPP-GUIDE.md](../docs/TPP-GUIDE.md) — workflow
 - [docs/DESIGN.md](../docs/DESIGN.md) — "wcwidth" pitfall, Unicode-version skew
-- `../python-ftfy/ftfy/formatting.py` (and its module doctests = the acceptance tests)
+- `python-ftfy/ftfy/formatting.py` (and its module doctests = the acceptance tests)
 - The `wcwidth` package source (record the exact version + its Unicode data version)
 - The `codegen-and-generated-tables` TPP — for the shared generated-header/determinism conventions
 

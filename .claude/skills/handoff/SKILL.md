@@ -17,7 +17,7 @@ Before any work, you MUST read:
 - [docs/TPP-GUIDE.md](docs/TPP-GUIDE.md) — the TPP workflow
 
 This is a faithful TypeScript port of `python-ftfy`. The upstream Python source at
-`../python-ftfy/ftfy/` is the spec and its `tests/` are the acceptance
+`python-ftfy/ftfy/` is the spec and its `tests/` are the acceptance
 criteria.
 
 ## Your Task

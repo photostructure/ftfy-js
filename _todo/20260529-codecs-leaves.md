@@ -28,8 +28,8 @@ TPP (`codecs-dispatcher`) so this one has no half-implemented branches.
 - [CLAUDE.md](../CLAUDE.md) — locked decisions, build/test commands
 - [docs/TPP-GUIDE.md](../docs/TPP-GUIDE.md) — workflow
 - [docs/DESIGN.md](../docs/DESIGN.md) — "Bytes boundary", "Error messages are API", "Codegen tables"
-- `../python-ftfy/ftfy/bad_codecs/sloppy.py`
-- `../python-ftfy/tests/test_encodings.py`, `../python-ftfy/tests/test_bytes.py` — acceptance tests
+- `python-ftfy/ftfy/bad_codecs/sloppy.py`
+- `python-ftfy/tests/test_encodings.py`, `python-ftfy/tests/test_bytes.py` — acceptance tests
 - `src/generated/charmaps.ts` (from the codegen TPP)
 
 ## Lore

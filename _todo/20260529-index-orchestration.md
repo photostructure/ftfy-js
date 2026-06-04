@@ -35,8 +35,8 @@ segmentation, and the public API (`fix_text`, `fix_and_explain`, `fix_encoding`,
 - [docs/TPP-GUIDE.md](../docs/TPP-GUIDE.md) — workflow
 - [docs/DESIGN.md](../docs/DESIGN.md) — "Strict decode is the control-flow backbone",
   "explain_unicode is async", "Import cycle", `fix_text`/`fix_file` segmentation pitfalls
-- `../python-ftfy/ftfy/__init__.py`
-- `../python-ftfy/tests/test_characters.py`, `../python-ftfy/tests/test_examples_in_json.py`
+- `python-ftfy/ftfy/__init__.py`
+- `python-ftfy/tests/test_characters.py`, `python-ftfy/tests/test_examples_in_json.py`
 
 ## Lore
 

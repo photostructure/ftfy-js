@@ -158,12 +158,12 @@ database, so a faithful, full-parity implementation needs a generated names tabl
 
 ## Primary spec files (upstream)
 
-- `../python-ftfy/ftfy/__init__.py` — fix loops, config, public API
-- `../python-ftfy/ftfy/chardata.py` — regexes/maps/clues, most codegen
-- `../python-ftfy/ftfy/fixes.py` — 12 fixers + `fix_encoding` (incl. byte fixers)
-- `../python-ftfy/ftfy/badness.py` — BADNESS_RE
-- `../python-ftfy/ftfy/bad_codecs/utf8_variants.py` — incremental CESU-8/Java decoder
-- `../python-ftfy/ftfy/bad_codecs/sloppy.py` — single-byte table construction
-- `../python-ftfy/ftfy/formatting.py` — display width (delegates to `wcwidth`)
-- `../python-ftfy/ftfy/cli.py` — CLI flags/errors
-- `../python-ftfy/tests/` — acceptance tests + `test-cases/*.json` + `face.txt`
+- `python-ftfy/ftfy/__init__.py` — fix loops, config, public API
+- `python-ftfy/ftfy/chardata.py` — regexes/maps/clues, most codegen
+- `python-ftfy/ftfy/fixes.py` — 12 fixers + `fix_encoding` (incl. byte fixers)
+- `python-ftfy/ftfy/badness.py` — BADNESS_RE
+- `python-ftfy/ftfy/bad_codecs/utf8_variants.py` — incremental CESU-8/Java decoder
+- `python-ftfy/ftfy/bad_codecs/sloppy.py` — single-byte table construction
+- `python-ftfy/ftfy/formatting.py` — display width (delegates to `wcwidth`)
+- `python-ftfy/ftfy/cli.py` — CLI flags/errors
+- `python-ftfy/tests/` — acceptance tests + `test-cases/*.json` + `face.txt`

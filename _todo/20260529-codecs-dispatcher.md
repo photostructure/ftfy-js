@@ -35,8 +35,8 @@ call.
 - [CLAUDE.md](../CLAUDE.md) — locked decisions, build/test commands
 - [docs/TPP-GUIDE.md](../docs/TPP-GUIDE.md) — workflow
 - [docs/DESIGN.md](../docs/DESIGN.md) — "Strict decode is the control-flow backbone", "Codegen tables"
-- `../python-ftfy/ftfy/bad_codecs/__init__.py` — `search_function`, the alias set
-- `../python-ftfy/tests/test_encodings.py`, `../python-ftfy/tests/test_bytes.py`
+- `python-ftfy/ftfy/bad_codecs/__init__.py` — `search_function`, the alias set
+- `python-ftfy/tests/test_encodings.py`, `python-ftfy/tests/test_bytes.py`
 - The `codecs-leaves`, `strict-utf8-decoder`, and `utf8-variants` TPPs
 
 ## Lore

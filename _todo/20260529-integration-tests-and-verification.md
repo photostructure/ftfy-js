@@ -34,9 +34,9 @@ corpus (with xfail-strict known-failures), transcribed doctests, CLI tests again
 - [CLAUDE.md](../CLAUDE.md) — locked decisions, build/test commands
 - [docs/TPP-GUIDE.md](../docs/TPP-GUIDE.md) — workflow
 - [docs/DESIGN.md](../docs/DESIGN.md) — Unicode-version skew, verification expectations
-- `../python-ftfy/tests/test_examples_in_json.py` — corpus harness & round-trips
-- `../python-ftfy/tests/test_cli.py` — CLI acceptance tests
-- `../python-ftfy/pytest.ini` — `--doctest-modules`
+- `python-ftfy/tests/test_examples_in_json.py` — corpus harness & round-trips
+- `python-ftfy/tests/test_cli.py` — CLI acceptance tests
+- `python-ftfy/pytest.ini` — `--doctest-modules`
 
 ## Lore
 

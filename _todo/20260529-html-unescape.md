@@ -27,7 +27,7 @@ verbatim port, not a dependency.
 - [docs/DESIGN.md](../docs/DESIGN.md) — "html.unescape exactness"
 - CPython `html/__init__.py` — `_charref`, `_replace_charref`, `_invalid_charrefs`,
   `_invalid_codepoints`
-- `../python-ftfy/tests/test_entities.py` — the entity acceptance tests
+- `python-ftfy/tests/test_entities.py` — the entity acceptance tests
 - `src/generated/html5-entities.ts` (from the codegen TPP)
 
 ## Lore

@@ -31,9 +31,9 @@ Built on the strict UTF-8 step machine.
 - [CLAUDE.md](../CLAUDE.md) — locked decisions, build/test commands
 - [docs/TPP-GUIDE.md](../docs/TPP-GUIDE.md) — workflow
 - [docs/DESIGN.md](../docs/DESIGN.md) — "UTF-8 / utf-8-variants"
-- `../python-ftfy/ftfy/bad_codecs/utf8_variants.py` — `_buffer_decode`,
+- `python-ftfy/ftfy/bad_codecs/utf8_variants.py` — `_buffer_decode`,
   `_buffer_decode_step`, `_buffer_decode_surrogates`, `CESU8_RE`, `SPECIAL_BYTES_RE`
-- `../python-ftfy/tests/test_encodings.py` (`test_cesu8`), `../python-ftfy/tests/test_bytes.py`
+- `python-ftfy/tests/test_encodings.py` (`test_cesu8`), `python-ftfy/tests/test_bytes.py`
 - The strict-utf8-decoder TPP (provides the base step machine + `IncrementalDecoder`)
 
 ## Lore

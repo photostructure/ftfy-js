@@ -26,8 +26,8 @@ decode throw, and the variants codec is built on top of this step machine.
 - [docs/TPP-GUIDE.md](../docs/TPP-GUIDE.md) — workflow
 - [docs/DESIGN.md](../docs/DESIGN.md) — "Strict decode is the control-flow backbone", "UTF-8 / utf-8-variants"
 - CPython's UTF-8 incremental decoder behavior (step machine, consumed-byte reporting)
-- `../python-ftfy/ftfy/bad_codecs/utf8_variants.py` — the consumer
-- `../python-ftfy/tests/test_bytes.py` — `test_incomplete_sequences` (the byte-split / buffering acceptance test)
+- `python-ftfy/ftfy/bad_codecs/utf8_variants.py` — the consumer
+- `python-ftfy/tests/test_bytes.py` — `test_incomplete_sequences` (the byte-split / buffering acceptance test)
 
 ## Lore
 

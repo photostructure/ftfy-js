@@ -61,8 +61,8 @@ YYYYMMDD-feature-name.md
 (v6.3.1, Apache-2.0, by Robyn Speer). The guiding rule is **parity, not
 innovation**: mirror Python module-for-module, function-for-function.
 
-- The upstream Python source at `../python-ftfy/ftfy/` is the **spec**.
-- The upstream tests under `../python-ftfy/tests/` are the **acceptance
+- The upstream Python source at `python-ftfy/ftfy/` is the **spec**.
+- The upstream tests under `python-ftfy/tests/` are the **acceptance
   criteria** — port tests first, then implement until they pass.
 - Build: `npm run build` (tsdown). Test: `npm test` (Vitest).
 - See [CLAUDE.md](../CLAUDE.md) for the full architecture, locked decisions, and
@@ -143,8 +143,8 @@ YOU MUST study these before continuing. Work may be rejected if you skip them.
 
 - **[CLAUDE.md](../CLAUDE.md)**: project structure, local rules, test commands
 - **[TPP-GUIDE.md](./TPP-GUIDE.md)**: this workflow
-- The upstream Python file this work mirrors (under `../python-ftfy/ftfy/`)
-- The upstream test(s) that prove it (under `../python-ftfy/tests/`)
+- The upstream Python file this work mirrors (under `python-ftfy/ftfy/`)
+- The upstream test(s) that prove it (under `python-ftfy/tests/`)
 - Add the source files that define the subsystem
 
 ## Description

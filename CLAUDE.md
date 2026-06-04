@@ -13,12 +13,11 @@ direct port of python-ftfy.
 
 ## Sources of truth
 
-- **Spec:** `../python-ftfy/ftfy/` — the Python source. Port it verbatim.
-- **Acceptance criteria:** `../python-ftfy/tests/` — port tests first,
+- **Spec:** `python-ftfy/ftfy/` — the Python source submodule. Port it verbatim.
+- **Acceptance criteria:** `python-ftfy/tests/` — port tests first,
   then implement until they pass. Keep filenames and test bodies as verbatim as
   TypeScript allows.
-- **Master plan / detailed design:** see the TPPs in `_todo/` and `_done/`, and
-  `plan.md` until it has been fully decomposed.
+- **Master plan / detailed design:** see the TPPs in `_todo/` and `_done/`.
 
 Record the upstream commit SHA before the first implementation commit and verify
 `__version__ == "6.3.1"` so future drift is unambiguous.
@@ -40,6 +39,8 @@ and next steps across sessions. See [docs/TPP-GUIDE.md](docs/TPP-GUIDE.md).
 - Test: `npm test` (Vitest; `test.each` for parametrized, `test.fails` for xfail-strict)
 - Regenerate data tables: `python3 scripts/gen_*.py` — must produce **no git diff**
   (parity guard; CI re-runs codegen and asserts no diff)
+- Sync upstream spec: `npm run upstream:sync` — updates the `python-ftfy`
+  submodule to upstream `main` HEAD and regenerates copied fixtures/generated tables.
 
 ## Locked decisions
 
