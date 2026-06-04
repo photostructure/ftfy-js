@@ -1,0 +1,10 @@
+# Vendored Python deps for codegen (e.g. wcwidth); not part of the package.
+.pyenv/
+
+# Python bytecode caches from the scripts/ codegen.
+__pycache__/
+*.py[cod]
+
+node_modules/
+dist/
+*.tsbuildinfo

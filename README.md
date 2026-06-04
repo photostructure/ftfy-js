@@ -74,6 +74,22 @@ ftfy -e sloppy-windows-1252 in.txt -o out.txt
 cat somefile.txt | ftfy           # read from stdin
 ```
 
+## Versioning
+
+This package follows **its own [semver](https://semver.org) line, independent of
+python-ftfy's version numbers.** The npm `version` describes the stability of _this
+package's_ API; the exported `__version__` separately records the upstream python-ftfy
+release this port mirrors (currently `6.3.1`). The two move independently — a bugfix
+release here bumps the npm version without changing `__version__`.
+
+- **`0.x`** while the port is still reaching full parity with python-ftfy's test suite.
+- **`1.0.0`** once parity is complete and the public API is stable.
+- After that, ordinary semver: patch for fixes, minor for additive API, major for
+  breaking changes — regardless of which version upstream is on.
+
+Releases are cut entirely by CI ([`.github/workflows/build.yml`](.github/workflows/build.yml)
+via `workflow_dispatch`); the `version` field in `package.json` is never edited by hand.
+
 ## Status
 
 This is an in-progress, parity-driven port. Correctness is defined by python-ftfy's test

@@ -1,0 +1,15 @@
+@photostructure/ftfy
+Copyright PhotoStructure, Inc. and contributors.
+
+This product is a derivative work: a faithful TypeScript port of python-ftfy.
+
+python-ftfy
+Copyright Robyn Speer <rspeer@arborelia.net>
+https://github.com/rspeer/python-ftfy
+
+python-ftfy is licensed under the Apache License, Version 2.0. This port mirrors
+python-ftfy v6.3.1 (upstream commit 74dd0452b48286a3770013b3a02755313bd5575e)
+module-for-module and is likewise distributed under the Apache License, Version 2.0.
+
+The encoding-detection heuristics, badness model, sloppy codecs, and CESU-8 /
+Java UTF-8 variant decoders are the original work of Robyn Speer.

@@ -1,0 +1,125 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version type (patch, minor, major, or specific version)"
+        required: false
+        type: string
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    defaults:
+      run:
+        shell: bash
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        # engines.node is ">=22"; test the non-EOL LTS lines (22, 24) plus current (26).
+        # 20 is EOL (2026-04-30) and below our floor; 25 is non-LTS, EOL 2026-06-01.
+        # See https://nodejs.org/en/about/releases/
+        node-version: [22, 24, 26]
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          submodules: true
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm test
+
+      # Validate generated tables and copied upstream fixtures once
+      # (OS/Node-independent, but requires uv for pinned Python codegen).
+      - name: Install uv
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == 22
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+
+      - name: Check codegen parity
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == 22
+        run: npm run gen:check
+
+      # Validate the published package shape once (cheap; OS/Node-independent).
+      - name: Validate package (publint + are-the-types-wrong)
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == 22
+        run: |
+          npx publint
+          npx attw --pack .
+
+  publish:
+    runs-on: ubuntu-24.04
+    needs: [build]
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    permissions:
+      id-token: write # Required for OIDC trusted publishing (npm provenance)
+      contents: write # Required to push the version commit/tag and create the release
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0 # Need full history for version tags
+          submodules: true
+
+      # setup-node with registry-url is required for OIDC trusted publishing
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: 22
+          cache: "npm"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Set up SSH signing
+        uses: photostructure/git-ssh-signing-action@eb48d0517cdf304a5fde87d539702a74ebc01e09 # v2.0.0
+        with:
+          ssh-signing-key: ${{ secrets.SSH_SIGNING_KEY }}
+          git-user-name: ${{ secrets.GIT_USER_NAME }}
+          git-user-email: ${{ secrets.GIT_USER_EMAIL }}
+
+      - name: Update npm to latest to get --provenance support
+        run: |
+          npm install -g npm@latest
+          npm --version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and test before publishing
+        run: |
+          npm run typecheck
+          npm run build
+          npm test
+
+      - name: Bump version and create tag
+        run: |
+          VERSION_ARG="${{ github.event.inputs.version }}"
+          if [ -z "$VERSION_ARG" ]; then
+            VERSION_ARG="patch"
+          fi
+          npm version "$VERSION_ARG" --sign-git-tag -m "chore(release): %s"
+          echo "NEW_VERSION=$(npm pkg get version | tr -d '\"')" >> $GITHUB_ENV
+
+      - name: Push changes and tags
+        run: |
+          git push origin main
+          git push origin --tags
+
+      - name: Create GitHub Release
+        run: gh release create "v${{ env.NEW_VERSION }}" --generate-notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Scoped package: --access public is required (defaults to restricted).
+      # --provenance attaches the OIDC build-provenance attestation.
+      - name: Publish to npm with OIDC
+        run: npm publish --provenance --access public

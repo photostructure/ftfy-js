@@ -1,0 +1,85 @@
+{
+  "name": "@photostructure/ftfy",
+  "version": "0.0.0",
+  "description": "Fixes mojibake and other Unicode glitches after the fact — a faithful TypeScript port of python-ftfy by Robyn Speer.",
+  "keywords": [
+    "ftfy",
+    "mojibake",
+    "unicode",
+    "encoding",
+    "utf-8",
+    "windows-1252",
+    "text",
+    "fix"
+  ],
+  "private": false,
+  "homepage": "https://github.com/photostructure/ftfy-js#readme",
+  "bugs": {
+    "url": "https://github.com/photostructure/ftfy-js/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/photostructure/ftfy-js.git"
+  },
+  "license": "Apache-2.0",
+  "author": "PhotoStructure, Inc.",
+  "contributors": [
+    "Robyn Speer <rspeer@arborelia.net> (original python-ftfy author)"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "ftfy": "dist/bin.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "NOTICE",
+    "CHANGELOG.md"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "ncu": "npx -y -p npm-check-updates ncu -u",
+    "build": "tsdown",
+    "fmt": "prettier --write . && uvx ruff@0.14.4 format --line-length 100 scripts",
+    "fmt:check": "prettier --check . && uvx ruff@0.14.4 format --check --line-length 100 scripts",
+    "lint": "npm run fmt:check && uvx ruff@0.14.4 check --line-length 100 scripts && publint --pack=false",
+    "all": "npm run ncu && npm run upstream:sync && npm run gen:check && npm run fmt && npm run build && npm run lint && npm test",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "gen": "uv run scripts/gen_all.py",
+    "gen:check": "uv run scripts/gen_all.py && git diff --exit-code -- src/generated tests/test-cases tests/face.txt",
+    "upstream:sync": "git submodule update --init --remote --checkout python-ftfy && npm run gen",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "0.18.2",
+    "@types/node": "25.9.1",
+    "prettier": "3.8.3",
+    "prettier-plugin-organize-imports": "4.3.0",
+    "publint": "0.3.21",
+    "tsdown": "0.22.0",
+    "typescript": "6.0.3",
+    "vitest": "4.1.6"
+  }
+}

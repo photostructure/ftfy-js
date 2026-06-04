@@ -29,8 +29,10 @@ Empty-but-buildable package stands up cleanly. All exit criteria pass:
 
 - `package.json` — `@photostructure/ftfy`, Apache-2.0, `type: module`, dual
   `exports` (import→`.d.ts`/`.js`, require→`.d.cts`/`.cjs`), `bin.ftfy → dist/bin.js`,
-  `engines.node >= 22`, `sideEffects: false`, `files: [dist, README, LICENSE, NOTICE, CHANGELOG]`.
-  Scripts: `build` (tsdown), `test` (`vitest run`), `typecheck`, `gen` (`python3 scripts/gen_all.py`).
+  `engines.node >= 22`, `sideEffects: false`, `files: [dist, README, LICENSE, NOTICE,
+  CHANGELOG]`. Scripts: `build` (tsdown), `test` (`vitest run`), `typecheck`, `gen`
+  (`uv run scripts/gen_all.py`), plus `gen:check`, formatting/lint, and the `all` script
+  added by the codegen TPP.
   npm package version is `0.0.0` (placeholder, tracked separately from upstream `__version__`).
 - `tsconfig.json` — nodenext/es2023/strict, `noEmit`, `verbatimModuleSyntax`,
   `types: [node]`, includes src+tests+config files. `tsconfig.build.json` extends it with
@@ -48,22 +50,22 @@ Empty-but-buildable package stands up cleanly. All exit criteria pass:
 
 - **Upstream pin:** python-ftfy v6.3.1, commit `74dd0452b48286a3770013b3a02755313bd5575e`
   (2024-10-30). Recorded in both `NOTICE` and `CHANGELOG.md`. `__version__` must stay `"6.3.1"`.
-- **Local env:** Node v24.16.0 / npm 11.13.0 (engines floor is 22). Resolved dev deps:
-  tsdown 0.15.12, vitest 3.2.4, typescript 5.9.2, attw 0.18.x, publint 0.3.21.
+- **Local env when last validated:** Node v24.16.0 / npm 11.13.0 (engines floor is 22).
+  Resolved dev deps: tsdown 0.22.0, vitest 4.1.6, typescript 6.0.3,
+  @arethetypeswrong/cli 0.18.2, publint 0.3.21.
 - **Build contract verified present:** `dist/index.js` (ESM), `dist/index.cjs` (CJS),
   `dist/cli.js` (+ `.cjs`, importable by tests), `dist/bin.js` (shebang `#!/usr/bin/env node`,
   executable). `.d.ts` + `.d.cts` emitted for each.
-- **Code-splitting note (not a problem, but expect it):** tsdown emits shared chunks with
-  content-hashed names (e.g. `dist/src-B-q1IjHn.js`, `dist/cli-DDoxUebH.js`) because
-  bin→cli→index share modules. All four contract entry files exist as stable re-export
-  shims pointing at those chunks; attw/publint are green. If churny hashed filenames become
-  annoying, revisit tsdown splitting/unbundle options — left as-is since it's standard and clean.
+- **Build-output note:** current tsdown output emits stable entry files directly
+  (`dist/index.{js,cjs}`, `dist/cli.{js,cjs}`, `dist/bin.{js,cjs}` plus declarations). If later
+  implementation modules cause shared content-hashed chunks, that is acceptable as long as the
+  contract entry files remain stable and attw/publint stay green.
 - **isolatedDeclarations is live** in the build config: every exported function needs an
   explicit return type (e.g. `cli.main` is annotated `Promise<number>`). Design public APIs
   accordingly from the start.
 - `.gitignore` already covers `node_modules/`, `dist/`, `*.tsbuildinfo`, `.pyenv/`.
-- `scripts/gen_all.py` does **not** exist yet — `npm run gen` is wired but will fail until the
-  codegen TPP lands it. Intentional.
+- `scripts/gen_all.py` now exists (landed by the codegen TPP). Use `npm run gen` to refresh
+  generated data and `npm run gen:check` to verify no generated drift.
 
 ## Required reading
 
