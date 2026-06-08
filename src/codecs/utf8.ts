@@ -38,7 +38,7 @@
  * A faithful port of python-ftfy by Robyn Speer (Apache-2.0).
  */
 
-import { DecodeError } from "./errors.js";
+import { DecodeError, EncodeError } from "./errors.js";
 
 /** CPython's encoding label for the built-in UTF-8 codec in error messages. */
 const UTF8_LABEL = "utf-8";
@@ -46,6 +46,15 @@ const UTF8_LABEL = "utf-8";
 const REASON_INVALID_START = "invalid start byte";
 const REASON_INVALID_CONTINUATION = "invalid continuation byte";
 const REASON_UNEXPECTED_END = "unexpected end of data";
+const REASON_SURROGATES_NOT_ALLOWED = "surrogates not allowed";
+
+/**
+ * Matches any UTF-16 surrogate *code unit*. Compiled WITHOUT the `u` flag so it
+ * matches lone surrogates (a `u`-mode class would only match well-formed pairs),
+ * and without `g`/`y` so `.test()` carries no `lastIndex` state. Used only as a
+ * cheap "could this string contain a lone surrogate?" pre-check.
+ */
+const SURROGATE_CODE_UNIT_RE = /[\ud800-\udfff]/;
 
 /**
  * The valid range `[lo, hi]` for the *second* byte of a multi-byte sequence,
@@ -135,13 +144,22 @@ export function utf8BufferDecode(
     if (avail < 2) {
       // Only the lead byte is available.
       if (final) {
-        throw new DecodeError(UTF8_LABEL, bytes, i, i + 1, REASON_UNEXPECTED_END);
+        throw new DecodeError(
+          UTF8_LABEL,
+          bytes,
+          i,
+          i + 1,
+          REASON_UNEXPECTED_END,
+        );
       }
       // Buffer the incomplete tail for more input.
       break;
     }
     const b1 = bytes[i + 1]!;
     if (b1 < lo || b1 > hi) {
+      if (!final && b0 === 0xed && avail === 2 && b1 >= 0xa0 && b1 <= 0xbf) {
+        break;
+      }
       // Out of range for this lead: overlong / surrogate / >10FFFF / bad cont.
       throw new DecodeError(
         UTF8_LABEL,
@@ -277,13 +295,47 @@ export function utf8Decode(bytes: Uint8Array): string {
  * Encode a string to UTF-8 bytes.
  *
  * CPython's strict UTF-8 encoder throws `UnicodeEncodeError` on lone
- * surrogates. ftfy never feeds a lone surrogate through this encode path (the
- * fix loop only re-encodes text it just produced by decoding), so we delegate
- * to the platform `TextEncoder`, which is byte-identical to
- * `str.encode("utf-8")` for every well-formed input. (The variants encoder is
- * documented as "identical to UTF-8", so it re-uses this directly.)
+ * surrogates. After validating that strict-only edge case, `TextEncoder` is
+ * byte-identical to `str.encode("utf-8")` for every well-formed input. (The
+ * variants encoder is documented as "identical to UTF-8", so it re-uses this
+ * directly.)
  */
 export function utf8Encode(text: string): Uint8Array {
+  // Fast path: a lone surrogate is only possible when a surrogate code unit is
+  // present at all. The vast majority of inputs have none, so skip the O(n)
+  // JS-level scan and let TextEncoder (native) do the single pass.
+  if (SURROGATE_CODE_UNIT_RE.test(text)) {
+    let pyPos = 0;
+    for (let i = 0; i < text.length; i++) {
+      const code = text.charCodeAt(i);
+      if (code >= 0xd800 && code <= 0xdbff) {
+        const next = text.charCodeAt(i + 1);
+        if (next >= 0xdc00 && next <= 0xdfff) {
+          // A well-formed surrogate pair = one astral codepoint.
+          i++;
+          pyPos++;
+          continue;
+        }
+        throw new EncodeError(
+          UTF8_LABEL,
+          text,
+          pyPos,
+          pyPos + 1,
+          REASON_SURROGATES_NOT_ALLOWED,
+        );
+      }
+      if (code >= 0xdc00 && code <= 0xdfff) {
+        throw new EncodeError(
+          UTF8_LABEL,
+          text,
+          pyPos,
+          pyPos + 1,
+          REASON_SURROGATES_NOT_ALLOWED,
+        );
+      }
+      pyPos++;
+    }
+  }
   return new TextEncoder().encode(text);
 }
 
