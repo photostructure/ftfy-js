@@ -10,8 +10,13 @@ test fixtures verbatim, so any drift from python-ftfy surfaces as a diff.
 
 # /// script
 # requires-python = "==3.12.*"
-# dependencies = ["wcwidth"]
+# dependencies = ["wcwidth==0.2.13"]
 # ///
+#
+# wcwidth is pinned to 0.2.13 because gen_wcwidth emits its interval tables and
+# asserts that exact version (its `wcswidth` is the simple per-character sum whose
+# tables make the formatting.py doctests pass). `import ftfy` works under any
+# wcwidth release, so this pin is safe for the other generators too.
 
 from __future__ import annotations
 
@@ -25,6 +30,7 @@ import gen_html5_entities
 import gen_mojibake_categories
 import gen_unicode_names
 import gen_utf8_clues
+import gen_wcwidth
 
 GENERATORS = [
     gen_charmaps,
@@ -33,6 +39,7 @@ GENERATORS = [
     gen_mojibake_categories,
     gen_html5_entities,
     gen_unicode_names,
+    gen_wcwidth,
 ]
 
 
