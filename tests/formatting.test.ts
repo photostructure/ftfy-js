@@ -15,6 +15,10 @@ import {
   display_rjust,
   monospaced_width,
 } from "../src/formatting.js";
+import {
+  character_width as root_character_width,
+  display_ljust as root_display_ljust,
+} from "../src/index.js";
 
 const REPO_ROOT = fileURLToPath(new URL("..", import.meta.url));
 
@@ -26,6 +30,12 @@ describe("character_width", () => {
     ["\n", -1],
   ])("character_width(%j) === %d", (char, expected) => {
     expect(character_width(char)).toBe(expected);
+  });
+
+  test("throws on multi-codepoint strings", () => {
+    expect(() => character_width("ab")).toThrow(
+      "ord() expected a character, but string of length 2 found",
+    );
   });
 });
 
@@ -70,6 +80,12 @@ describe("display_ljust", () => {
   test("throws when fillchar is not width 1", () => {
     expect(() => display_ljust("x", 5, "車")).toThrow(
       "The padding character must have display width 1",
+    );
+  });
+
+  test("throws when fillchar has multiple codepoints", () => {
+    expect(() => display_ljust("x", 5, "ab")).toThrow(
+      "ord() expected a character, but string of length 2 found",
     );
   });
 });
@@ -130,5 +146,12 @@ describe("wcwidth-tables.ts is deterministic codegen output", () => {
     }
     const after = readFileSync(tablePath, "utf8");
     expect(after).toBe(before);
+  });
+});
+
+describe("package root formatting exports", () => {
+  test("exports display-width helpers from index.ts", () => {
+    expect(root_character_width("A")).toBe(1);
+    expect(root_display_ljust("x", 3, ".")).toBe("x..");
   });
 });

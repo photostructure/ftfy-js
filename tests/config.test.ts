@@ -7,8 +7,10 @@ import {
   makeConfig,
   registerFixers,
   replace,
-  type TextFixerConfig,
+  TextFixerConfig,
+  type TextFixerConfig as TextFixerConfigType,
 } from "../src/config.js";
+import { TextFixerConfig as RootTextFixerConfig } from "../src/index.js";
 
 describe("makeConfig", () => {
   test("returns the Python defaults", () => {
@@ -48,6 +50,18 @@ describe("makeConfig", () => {
   test("returns a fresh object each call", () => {
     expect(makeConfig()).not.toBe(makeConfig());
   });
+
+  test("rejects unknown fields like Python's NamedTuple constructor", () => {
+    expect(() => makeConfig({ bogus: true } as never)).toThrow(
+      "Unknown TextFixerConfig field: 'bogus'",
+    );
+  });
+
+  test("TextFixerConfig is a runtime constructor-compatible factory", () => {
+    expect(TextFixerConfig({ explain: false })).toEqual(
+      makeConfig({ explain: false }),
+    );
+  });
 });
 
 describe("replace", () => {
@@ -70,6 +84,12 @@ describe("replace", () => {
     expect(replaced.max_decode_length).toBe(42);
     expect(replaced.uncurl_quotes).toBe(false);
     expect(replaced.unescape_html).toBe("auto");
+  });
+
+  test("rejects unknown fields", () => {
+    expect(() => replace(makeConfig(), { bogus: true } as never)).toThrow(
+      "Unknown TextFixerConfig field: 'bogus'",
+    );
   });
 });
 
@@ -168,7 +188,29 @@ describe("configFromKwargs", () => {
     );
     const result = configFromKwargs(makeConfig(), {
       fix_entities: true,
-    }) as TextFixerConfig & { fix_entities?: unknown };
+    }) as TextFixerConfigType & { fix_entities?: unknown };
     expect("fix_entities" in result).toBe(false);
+  });
+
+  test("rejects unknown kwargs after translating fix_entities", () => {
+    vi.spyOn(process, "emitWarning").mockImplementation(
+      (() => {}) as typeof process.emitWarning,
+    );
+    expect(() =>
+      configFromKwargs(makeConfig(), {
+        fix_entities: true,
+        bogus: true,
+      } as never),
+    ).toThrow("Unknown TextFixerConfig field: 'bogus'");
+  });
+});
+
+describe("package root config exports", () => {
+  test("exports the callable TextFixerConfig from index.ts", () => {
+    // Only the python-public names are re-exported from the package root; the
+    // camelCase helpers (makeConfig, replace, …) stay module-internal.
+    expect(RootTextFixerConfig({ unescape_html: false })).toEqual(
+      makeConfig({ unescape_html: false }),
+    );
   });
 });

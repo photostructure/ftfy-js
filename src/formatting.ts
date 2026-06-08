@@ -134,8 +134,16 @@ function removeTerminalEscapes(text: string): string {
  * Mirrors Python's `character_width`, which takes a single-character string.
  */
 export function character_width(char: string): number {
-  const cp = char.length === 0 ? 0 : (char.codePointAt(0) as number);
-  return wcwidth(cp);
+  // Python's `character_width` does `wcwidth(char)`, whose first act is
+  // `ord(char)` — so anything other than exactly one codepoint (including the
+  // empty string) raises this TypeError, not just multi-char strings.
+  const length = Array.from(char).length;
+  if (length !== 1) {
+    throw new TypeError(
+      `ord() expected a character, but string of length ${length} found`,
+    );
+  }
+  return wcwidth(char.codePointAt(0) as number);
 }
 
 /**

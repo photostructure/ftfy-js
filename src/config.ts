@@ -110,6 +110,50 @@ export interface TextFixerConfig {
   explain: boolean;
 }
 
+/** The 16 field names accepted by Python's TextFixerConfig NamedTuple. */
+export const TEXT_FIXER_CONFIG_FIELDS = [
+  "unescape_html",
+  "remove_terminal_escapes",
+  "fix_encoding",
+  "restore_byte_a0",
+  "replace_lossy_sequences",
+  "decode_inconsistent_utf8",
+  "fix_c1_controls",
+  "fix_latin_ligatures",
+  "fix_character_width",
+  "uncurl_quotes",
+  "fix_line_breaks",
+  "fix_surrogates",
+  "remove_control_chars",
+  "normalization",
+  "max_decode_length",
+  "explain",
+] as const satisfies readonly (keyof TextFixerConfig)[];
+
+const TEXT_FIXER_CONFIG_FIELD_SET = new Set<string>(TEXT_FIXER_CONFIG_FIELDS);
+
+/**
+ * Reject unknown config fields. Python's `TextFixerConfig` NamedTuple rejects
+ * unexpected keyword arguments (from both the constructor and `_replace`), and
+ * we keep that *behavior* so a mistyped key fails loudly instead of silently
+ * leaking into the config. We do NOT mirror CPython's exact wording here — that
+ * message (`...__new__() got an unexpected keyword argument...`) is a Python
+ * implementation detail no upstream test pins, and `__new__` is meaningless in
+ * a TypeScript library. An idiomatic `TypeError` naming the field is clearer.
+ */
+function assertKnownConfigKeys(
+  obj: object,
+): asserts obj is Partial<TextFixerConfig> {
+  const unexpected = Object.keys(obj).filter(
+    (key) => !TEXT_FIXER_CONFIG_FIELD_SET.has(key),
+  );
+  if (unexpected.length > 0) {
+    const names = unexpected.map((k) => `'${k}'`).join(", ");
+    const plural = unexpected.length > 1 ? "s" : "";
+    throw new TypeError(`Unknown TextFixerConfig field${plural}: ${names}`);
+  }
+}
+
 /**
  * The 12 fixer names, in the order they appear in Python's `FIXERS` dict
  * (`ftfy/__init__.py`). The order matters because the registry and the public
@@ -168,7 +212,9 @@ const fixerRegistry: Partial<Record<FixerName, FixerFn>> = Object.create(null);
  * once by Wave 3's `fixes.ts`/`index.ts`. Accepts a partial map so it can be
  * called incrementally if needed; calling it again overwrites existing entries.
  */
-export function registerFixers(fixers: Partial<Record<FixerName, FixerFn>>): void {
+export function registerFixers(
+  fixers: Partial<Record<FixerName, FixerFn>>,
+): void {
   for (const name of Object.keys(fixers) as FixerName[]) {
     const fn = fixers[name];
     if (fn !== undefined) {
@@ -209,7 +255,10 @@ export const FIXERS: Record<FixerName, FixerFn> = new Proxy(
     has(target, prop: string | symbol): boolean {
       // Mirror Python's `name in FIXERS`: membership is by the known fixer
       // names, regardless of whether the function has been wired in yet.
-      return typeof prop === "string" && (FIXER_NAMES as readonly string[]).includes(prop);
+      return (
+        typeof prop === "string" &&
+        (FIXER_NAMES as readonly string[]).includes(prop)
+      );
     },
   },
 );
@@ -220,7 +269,9 @@ export const FIXERS: Record<FixerName, FixerFn> = new Proxy(
  * mutate without affecting others (in practice we treat configs as immutable
  * and use {@link replace}).
  */
-export function makeConfig(overrides?: Partial<TextFixerConfig>): TextFixerConfig {
+export function makeConfig(
+  overrides?: Partial<TextFixerConfig>,
+): TextFixerConfig {
   const base: TextFixerConfig = {
     unescape_html: "auto",
     remove_terminal_escapes: true,
@@ -240,9 +291,17 @@ export function makeConfig(overrides?: Partial<TextFixerConfig>): TextFixerConfi
     explain: true,
   };
   if (overrides !== undefined) {
+    assertKnownConfigKeys(overrides);
     return { ...base, ...overrides };
   }
   return base;
+}
+
+/** Runtime constructor-compatible factory for Python's TextFixerConfig NamedTuple. */
+export function TextFixerConfig(
+  overrides?: Partial<TextFixerConfig>,
+): TextFixerConfig {
+  return makeConfig(overrides);
 }
 
 /**
@@ -253,6 +312,7 @@ export function replace(
   config: TextFixerConfig,
   partial: Partial<TextFixerConfig>,
 ): TextFixerConfig {
+  assertKnownConfigKeys(partial);
   return { ...config, ...partial };
 }
 

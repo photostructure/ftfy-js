@@ -20,3 +20,21 @@
  * `python-ftfy/ftfy/__init__.py` so future drift is unambiguous.
  */
 export const __version__ = "6.3.1";
+
+// Public, python-ftfy-compatible config surface only. `TextFixerConfig`
+// (callable like the Python NamedTuple constructor, plus the type), `FIXERS`,
+// and the Explanation data model are part of ftfy's public API; the camelCase
+// helpers (`makeConfig`, `replace`, `configFromKwargs`, `registerFixers`,
+// `tryFix`) and port-invented types have no upstream counterpart and stay
+// module-internal — they are imported directly from "./config.js" by the
+// internals that need them (e.g. Wave 3's fixes.ts calls `registerFixers`).
+export { FIXERS, TextFixerConfig } from "./config.js";
+export type { ExplainedText, ExplanationStep } from "./config.js";
+
+export {
+  character_width,
+  display_center,
+  display_ljust,
+  display_rjust,
+  monospaced_width,
+} from "./formatting.js";
