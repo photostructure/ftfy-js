@@ -11,6 +11,14 @@ function-for-function — including the parts that look unusual because they enc
 Python edge-case behavior. The package must carry clear attribution that it is a
 direct port of python-ftfy.
 
+**Parity is anchored by the upstream tests.** Behavior that `python-ftfy/tests/`
+pins — fixer output, CLI stderr/stdout, the `DecodeError`/charmap messages — is a
+hard contract: reproduce it exactly. Code paths upstream never tests carry no such
+obligation; there, match the _behavior_ but write idiomatic TypeScript — do not
+transcribe CPython internals for their own sake (e.g. leaking `__new__` into an
+error string, or mirroring the `TypeError`-vs-`ValueError` split, in an
+unknown-kwarg guard no test exercises). Faithful ≠ slavish.
+
 ## Sources of truth
 
 - **Spec:** `python-ftfy/ftfy/` — the Python source submodule. Port it verbatim.
@@ -37,8 +45,11 @@ and next steps across sessions. See [docs/TPP-GUIDE.md](docs/TPP-GUIDE.md).
 
 - Build: `npm run build` (tsdown — Rolldown-based, isolatedDeclarations for `.d.ts`)
 - Test: `npm test` (Vitest; `test.each` for parametrized, `test.fails` for xfail-strict)
-- Regenerate data tables: `python3 scripts/gen_*.py` — must produce **no git diff**
-  (parity guard; CI re-runs codegen and asserts no diff)
+- Typecheck: `npm run typecheck` (`tsc --noEmit`)
+- Regenerate data tables: `npm run gen` (`uv run scripts/gen_all.py` — provisions
+  `wcwidth`, pins Python 3.12 → unidata 15.0.0). `npm run gen:check` re-runs codegen
+  and asserts **no git diff** (parity guard; CI enforces it). Never hand-edit
+  `src/generated/`.
 - Sync upstream spec: `npm run upstream:sync` — updates the `python-ftfy`
   submodule to upstream `main` HEAD and regenerates copied fixtures/generated tables.
 
@@ -56,7 +67,10 @@ and next steps across sessions. See [docs/TPP-GUIDE.md](docs/TPP-GUIDE.md).
   (`fix_text`, `fix_and_explain`, `guess_bytes`, `apply_plan`, `TextFixerConfig`,
   `ExplanationStep`, `ExplainedText`, `__version__`). Keep snake_case config keys. The
   public API is **snake_case only — no camelCase aliases**; internal helpers with no public
-  Python counterpart may use idiomatic camelCase.
+  Python counterpart may use idiomatic camelCase. The package-root barrel (`src/index.ts`)
+  re-exports **only** the python-public names — the camelCase helpers
+  (`makeConfig`, `replace`, `configFromKwargs`, `registerFixers`, `tryFix`) stay
+  module-internal.
 - **License:** `Apache-2.0`. README, package.json, `NOTICE`, and `src/index.ts`
   must credit python-ftfy and Robyn Speer and link the upstream repo.
 
@@ -65,14 +79,15 @@ and next steps across sessions. See [docs/TPP-GUIDE.md](docs/TPP-GUIDE.md).
 ```
 src/
   index.ts        ← ftfy/__init__.py   (public API + the two fix loops)
-  config.ts        TextFixerConfig, Explanation types, FIXERS, makeConfig, replace
+  config.ts        TextFixerConfig, Explanation types, FIXERS registry, makeConfig/replace/configFromKwargs
   fixes.ts        ← ftfy/fixes.py       (12 FIXERS + fix_encoding step; byte-fixers on binary strings)
   chardata.ts     ← ftfy/chardata.py    (regexes, maps, clues, html.unescape consumer)
   badness.ts      ← ftfy/badness.py     (BADNESS_RE, is_bad, badness)
   formatting.ts   ← ftfy/formatting.py  (display width; ported wcwidth)
   html-entities.ts CPython html/__init__.py unescape() + generated html5 dict
   cli.ts / bin.ts ← ftfy/cli.py         (hand-rolled argparse clone; exact error texts/exit codes)
-  codecs/         encode/decode (Uint8Array), charmap, sloppy, strict utf8, utf8-variants, utf16
+  codecs/         Uint8Array⇄binary-string bridge, errors (DecodeError/EncodeError),
+                  charmap, sloppy, strict utf8, utf8-variants, utf16
   generated/      committed codegen output (do NOT hand-edit)
 scripts/          Python codegen (gen_*.py)
 tests/            ported Vitest suites + test-cases/*.json + face.txt (copied verbatim)
