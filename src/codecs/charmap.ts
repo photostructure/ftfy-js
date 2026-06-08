@@ -91,10 +91,7 @@ export function charmapEncode(
   encodeMap: ReadonlyMap<number, number>,
 ): Uint8Array {
   const out: number[] = [];
-  // Track the UTF-16 position so EncodeError positions match Python len()/CPython
-  // — but Python charmap encode positions are codepoint positions. We iterate by
-  // codepoint and advance the position by the codepoint's UTF-16 width to match
-  // CPython, which reports surrogate-pair positions in code units of the source.
+  // Track Python codepoint positions, not UTF-16 code units.
   let pos = 0;
   for (const ch of text) {
     const cp = ch.codePointAt(0)!;
@@ -104,12 +101,12 @@ export function charmapEncode(
         CHARMAP_LABEL,
         text,
         pos,
-        pos + ch.length,
+        pos + 1,
         UNDEFINED_REASON,
       );
     }
     out.push(byte);
-    pos += ch.length;
+    pos += 1;
   }
   return Uint8Array.from(out);
 }

@@ -10,9 +10,9 @@ import { describe, expect, test } from "vitest";
 
 import {
   buildEncodeMap,
+  CharmapCodec,
   charmapDecode,
   charmapEncode,
-  CharmapCodec,
 } from "../src/codecs/charmap.js";
 import { DecodeError, EncodeError } from "../src/codecs/errors.js";
 import {
@@ -71,9 +71,11 @@ describe("utf-16 BOM detection (guess_bytes path)", () => {
   });
 
   test("decodes little-endian BOM data", () => {
-    expect(utf16Decode(hex("fffe520065006e00e90065000a0046006c0065006d0069006e006700"))).toBe(
-      "Renée\nFleming",
-    );
+    expect(
+      utf16Decode(
+        hex("fffe520065006e00e90065000a0046006c0065006d0069006e006700"),
+      ),
+    ).toBe("Renée\nFleming");
     expect(utf16Decode(hex("fffebf0051007500e9003f00"))).toBe("¿Qué?");
   });
 
@@ -214,7 +216,7 @@ describe("charmap encode (last-write-wins build, throws on unmapped)", () => {
     }
   });
 
-  test("reports astral-char encode-failure position in UTF-16 units", () => {
+  test("reports astral-char encode-failure position in Python codepoints", () => {
     try {
       win1252.encode("\u{1F600}"); // 😀, not representable
       throw new Error("expected throw");
@@ -222,8 +224,24 @@ describe("charmap encode (last-write-wins build, throws on unmapped)", () => {
       expect(e).toBeInstanceOf(EncodeError);
       const ee = e as EncodeError;
       expect(ee.start).toBe(0);
-      expect(ee.end).toBe(2); // surrogate pair spans two UTF-16 units
+      expect(ee.end).toBe(1);
+      expect(ee.message).toBe(
+        "'charmap' codec can't encode character '\\U0001f600' in position 0: character maps to <undefined>",
+      );
     }
+  });
+
+  test("reports encode-failure position after astral chars in Python codepoints", () => {
+    const err = new EncodeError(
+      "charmap",
+      "\u{1F600}\u0081",
+      1,
+      2,
+      "character maps to <undefined>",
+    );
+    expect(err.message).toBe(
+      "'charmap' codec can't encode character '\\x81' in position 1: character maps to <undefined>",
+    );
   });
 });
 
@@ -271,7 +289,13 @@ describe("registries cover the expected encodings", () => {
   });
 
   test("real codecs include the CHARMAP_ENCODINGS bases", () => {
-    for (const n of ["latin-1", "iso-8859-2", "macroman", "cp437", "windows-1252"]) {
+    for (const n of [
+      "latin-1",
+      "iso-8859-2",
+      "macroman",
+      "cp437",
+      "windows-1252",
+    ]) {
       expect(REAL_CODECS.get(n), n).toBeInstanceOf(CharmapCodec);
     }
   });

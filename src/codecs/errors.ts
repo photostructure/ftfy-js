@@ -47,6 +47,20 @@ function charRepr(cp: number): string {
   return "\\U" + cp.toString(16).padStart(8, "0");
 }
 
+function codePointAtPythonIndex(
+  text: string,
+  index: number,
+): number | undefined {
+  let pos = 0;
+  for (const ch of text) {
+    if (pos === index) {
+      return ch.codePointAt(0);
+    }
+    pos++;
+  }
+  return undefined;
+}
+
 /** Mirrors CPython's `UnicodeEncodeError.__str__`. */
 function formatEncodeMessage(
   encoding: string,
@@ -56,7 +70,7 @@ function formatEncodeMessage(
   reason: string,
 ): string {
   if (end === start + 1) {
-    const cp = text.codePointAt(start) ?? 0;
+    const cp = codePointAtPythonIndex(text, start) ?? 0;
     return `'${encoding}' codec can't encode character '${charRepr(
       cp,
     )}' in position ${start}: ${reason}`;
@@ -109,7 +123,9 @@ export class EncodeError extends Error {
   readonly encoding: string;
   /** The string being encoded (the `object` field of `UnicodeEncodeError`). */
   readonly text: string;
+  /** Start index of the offending span, in Python codepoint positions. */
   readonly start: number;
+  /** End index (exclusive), in Python codepoint positions. */
   readonly end: number;
   readonly reason: string;
 
