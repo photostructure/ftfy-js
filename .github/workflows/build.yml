@@ -13,6 +13,31 @@ on:
         type: string
 
 jobs:
+  # OS/Node-independent gates: typecheck, lint/format, codegen parity, and
+  # published-package shape.
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          submodules: true
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: 22
+          cache: "npm"
+      # uv runs the pinned Python codegen for the parity check.
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+      - run: npm ci
+      - run: npm run typecheck
+      # build first: publint/attw inspect the emitted dist/.
+      - run: npm run build
+      - run: npm run lint # prettier + ruff + publint
+      - name: Check codegen parity
+        run: npm run gen:check
+      - name: Check published types (are-the-types-wrong)
+        run: npx attw --pack .
+
   build:
     runs-on: ${{ matrix.os }}
 
@@ -38,30 +63,12 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
       - run: npm ci
-      - run: npm run typecheck
       - run: npm run build
       - run: npm test
 
-      # Validate generated tables and copied upstream fixtures once
-      # (OS/Node-independent, but requires uv for pinned Python codegen).
-      - name: Install uv
-        if: matrix.os == 'ubuntu-latest' && matrix.node-version == 22
-        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
-
-      - name: Check codegen parity
-        if: matrix.os == 'ubuntu-latest' && matrix.node-version == 22
-        run: npm run gen:check
-
-      # Validate the published package shape once (cheap; OS/Node-independent).
-      - name: Validate package (publint + are-the-types-wrong)
-        if: matrix.os == 'ubuntu-latest' && matrix.node-version == 22
-        run: |
-          npx publint
-          npx attw --pack .
-
   publish:
     runs-on: ubuntu-24.04
-    needs: [build]
+    needs: [build, checks]
     if: ${{ github.event_name == 'workflow_dispatch' }}
     permissions:
       id-token: write # Required for OIDC trusted publishing (npm provenance)
