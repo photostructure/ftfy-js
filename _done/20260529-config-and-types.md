@@ -78,7 +78,7 @@ import * as fixes from "./fixes.js"; // namespace import only
 registerFixers({
   unescape_html: fixes.unescape_html,
   remove_terminal_escapes: fixes.remove_terminal_escapes,
-  restore_byte_a0: fixes.restore_byte_a0,            // byte-level: binary-string in/out
+  restore_byte_a0: fixes.restore_byte_a0, // byte-level: binary-string in/out
   replace_lossy_sequences: fixes.replace_lossy_sequences, // byte-level: binary-string in/out
   decode_inconsistent_utf8: fixes.decode_inconsistent_utf8,
   fix_c1_controls: fixes.fix_c1_controls,

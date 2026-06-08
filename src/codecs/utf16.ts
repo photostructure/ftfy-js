@@ -75,8 +75,7 @@ export function utf16Decode(bytes: Uint8Array): string {
       }
       const w2 = unit(pos + 2);
       if (w2 >= 0xdc00 && w2 <= 0xdfff) {
-        const cp =
-          0x10000 + (((w - 0xd800) << 10) | (w2 - 0xdc00));
+        const cp = 0x10000 + (((w - 0xd800) << 10) | (w2 - 0xdc00));
         out += String.fromCodePoint(cp);
         pos += 4;
       } else {

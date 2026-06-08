@@ -41,7 +41,7 @@ Exported symbols (import these from the Wave-2 dispatcher / fixes / guess_bytes)
   - `charmapEncode(text, encodeMap): Uint8Array` — iterates by codepoint; throws `EncodeError`;
     EncodeError positions are in UTF-16 units (astral char spans start..start+2).
   - `class CharmapCodec { name; decodingTable; holes; decode(bytes): string;
-    encode(text): Uint8Array; encodeMap(): ReadonlyMap<number,number> }` — lazy encode map.
+encode(text): Uint8Array; encodeMap(): ReadonlyMap<number,number> }` — lazy encode map.
   - Charmap errors use the CPython label `"charmap"` (not the human encoding name).
 - `src/codecs/sloppy.ts`
   - `normalizeEncoding(encoding: string): string` — faithful to CPython

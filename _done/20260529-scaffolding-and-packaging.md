@@ -30,7 +30,7 @@ Empty-but-buildable package stands up cleanly. All exit criteria pass:
 - `package.json` — `@photostructure/ftfy`, Apache-2.0, `type: module`, dual
   `exports` (import→`.d.ts`/`.js`, require→`.d.cts`/`.cjs`), `bin.ftfy → dist/bin.js`,
   `engines.node >= 22`, `sideEffects: false`, `files: [dist, README, LICENSE, NOTICE,
-  CHANGELOG]`. Scripts: `build` (tsdown), `test` (`vitest run`), `typecheck`, `gen`
+CHANGELOG]`. Scripts: `build` (tsdown), `test` (`vitest run`), `typecheck`, `gen`
   (`uv run scripts/gen_all.py`), plus `gen:check`, formatting/lint, and the `all` script
   added by the codegen TPP.
   npm package version is `0.0.0` (placeholder, tracked separately from upstream `__version__`).

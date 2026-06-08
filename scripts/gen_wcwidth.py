@@ -75,11 +75,7 @@ def _emit_table(name: str, table: tuple) -> str:
     # `table` is a tuple/list of (start, end) integer pairs, already sorted
     # ascending and non-overlapping (required for binary search).
     rows = "\n".join(f"  [{lo}, {hi}]," for (lo, hi) in table)
-    return (
-        f"export const {name}: ReadonlyArray<readonly [number, number]> = [\n"
-        f"{rows}\n"
-        f"];\n"
-    )
+    return f"export const {name}: ReadonlyArray<readonly [number, number]> = [\n{rows}\n];\n"
 
 
 def _wcwidth_header(generator: str) -> str:
