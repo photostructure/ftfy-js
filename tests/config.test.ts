@@ -130,9 +130,14 @@ describe("FIXERS registry", () => {
     expect(FIXERS.uncurl_quotes("x")).toBe("x!");
   });
 
-  test("looking up an unregistered known fixer throws", () => {
-    // restore_byte_a0 is not registered in this test file.
-    expect(() => FIXERS.restore_byte_a0).toThrow(/has not been registered/);
+  test("known fixers are wired once fixes.ts is loaded", () => {
+    // This file imports `../src/index.js`, which imports `fixes.ts`; loading
+    // `fixes.ts` runs its one-time `registerFixers(...)` call. So in this process
+    // every FIXER_NAMES entry resolves to a real function — the empty-registry
+    // "not registered yet" guard (a Wave-1 placeholder) is no longer reachable
+    // here. The guard itself is still covered in isolation by config-only
+    // consumers; see the Proxy `get` trap in config.ts.
+    expect(typeof FIXERS.restore_byte_a0).toBe("function");
   });
 });
 
