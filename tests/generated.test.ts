@@ -5,6 +5,9 @@
 // Byte-for-byte parity with python-ftfy is guarded separately by the CI no-diff
 // check that re-runs `python3 scripts/gen_all.py`.
 
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+
 import { describe, expect, test } from "vitest";
 
 import {
@@ -194,5 +197,55 @@ describe("unicode-names", () => {
     for (let i = 1; i < UNICODE_CATEGORIES.length; i++) {
       expect(UNICODE_CATEGORIES[i][0]).toBe(UNICODE_CATEGORIES[i - 1][1] + 1);
     }
+  });
+});
+
+describe("Unicode-version drift guards", () => {
+  // The codegen ran under CPython's unidata 15.0.0 (recorded in every generated
+  // header). Node's bundled ICU is independent and may be *newer* — the two are
+  // deliberately allowed to differ (see docs/DESIGN.md), but each side has a
+  // pinned baseline so a silent bump surfaces as a known signal rather than a
+  // mystery test failure. Bumping a baseline is a deliberate act that must
+  // accompany a re-validation of the affected tables.
+
+  // The unidata version the committed tables were generated against.
+  const CODEGEN_UNIDATA_BASELINE = "15.0.0";
+
+  // The Node ICU/Unicode version this port has been validated against. ftfy
+  // leans on Node's normalize()/category data only in a few spots
+  // (NFKC width folding, control-char classification); a newer ICU has so far
+  // stayed compatible. If Node ships an ICU that changes those, this fails so
+  // the port is re-checked rather than drifting silently.
+  const NODE_UNICODE_BASELINE = "17.0";
+
+  /** Read `unicodedata.unidata_version: X` out of a generated file's header. */
+  function generatedUnidataVersion(relPath: string): string {
+    const file = fileURLToPath(new URL(`../${relPath}`, import.meta.url));
+    const header = readFileSync(file, "utf8").slice(0, 600);
+    const m = header.match(/unidata_version:\s*([0-9.]+)/);
+    if (!m) throw new Error(`no unidata_version header in ${relPath}`);
+    return m[1];
+  }
+
+  test("every generated table records the same codegen unidata baseline", () => {
+    const files = [
+      "src/generated/charmaps.ts",
+      "src/generated/encoding-regexes.ts",
+      "src/generated/html5-entities.ts",
+      "src/generated/mojibake-categories.ts",
+      "src/generated/unicode-names.ts",
+      "src/generated/utf8-clues.ts",
+      "src/generated/wcwidth-tables.ts",
+    ];
+    for (const f of files) {
+      expect(generatedUnidataVersion(f), f).toBe(CODEGEN_UNIDATA_BASELINE);
+    }
+  });
+
+  test("Node's bundled Unicode version matches the validated baseline", () => {
+    // process.versions.unicode is e.g. "17.0". If this fails, a newer Node/ICU
+    // is in use: re-run the full suite, confirm the NFKC/category-dependent
+    // paths still match python-ftfy, then bump NODE_UNICODE_BASELINE.
+    expect(process.versions.unicode).toBe(NODE_UNICODE_BASELINE);
   });
 });
