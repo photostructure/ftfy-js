@@ -19,7 +19,7 @@
  * A faithful port of python-ftfy by Robyn Speer (Apache-2.0).
  */
 
-import { DecodeError } from "./errors.js";
+import { DecodeError, EncodeError } from "./errors.js";
 
 /** True when the buffer begins with a UTF-16 byte order mark. */
 export function hasUtf16Bom(bytes: Uint8Array): boolean {
@@ -94,6 +94,60 @@ export function utf16Decode(bytes: Uint8Array): string {
       out += String.fromCharCode(w);
       pos += 2;
     }
+  }
+  return out;
+}
+
+/**
+ * Encode UTF-16 like Python's `str.encode("utf-16")`: a little-endian BOM
+ * (`FF FE`) followed by little-endian 16-bit code units (CPython's
+ * platform-independent default for the `"utf-16"` codec on the platforms ftfy
+ * targets). No ftfy-internal path encodes UTF-16, but the public `apply_plan`
+ * accepts arbitrary user plans and Python would succeed on an
+ * `("encode", "utf-16")` step, so parity requires it.
+ *
+ * Strict: a lone surrogate THROWS {@link EncodeError} with CPython's
+ * `"surrogates not allowed"` reason, positioned in Python codepoints.
+ */
+export function utf16Encode(text: string): Uint8Array {
+  const out = new Uint8Array(2 + text.length * 2);
+  out[0] = 0xff;
+  out[1] = 0xfe;
+  let at = 2;
+  let pyPos = 0;
+  for (let i = 0; i < text.length; i++) {
+    const w = text.charCodeAt(i);
+    if (w >= 0xd800 && w <= 0xdbff) {
+      const w2 = i + 1 < text.length ? text.charCodeAt(i + 1) : 0;
+      if (w2 < 0xdc00 || w2 > 0xdfff) {
+        throw new EncodeError(
+          "utf-16",
+          text,
+          pyPos,
+          pyPos + 1,
+          "surrogates not allowed",
+        );
+      }
+      // A valid pair is one Python codepoint but two code units.
+      out[at++] = w & 0xff;
+      out[at++] = w >> 8;
+      out[at++] = w2 & 0xff;
+      out[at++] = w2 >> 8;
+      i += 1;
+    } else if (w >= 0xdc00 && w <= 0xdfff) {
+      // Lone low surrogate.
+      throw new EncodeError(
+        "utf-16",
+        text,
+        pyPos,
+        pyPos + 1,
+        "surrogates not allowed",
+      );
+    } else {
+      out[at++] = w & 0xff;
+      out[at++] = w >> 8;
+    }
+    pyPos += 1;
   }
   return out;
 }
