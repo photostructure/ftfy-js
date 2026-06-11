@@ -43,6 +43,10 @@ call.
 
 - Encoding-name resolution must accept the same aliases python-ftfy registers (sloppy-\*,
   utf-8-variants names, the `INCOMPLETE_ENCODINGS` set used by `fix_file -e`).
+- Deferred from the utf8-variants review (codex): upstream
+  `test_encodings.py::test_cesu8` asserts `"cesu8"` and `"cesu-8"` resolve to the same
+  codec before checking the decode vector. The utf8-variants TPP only ported the decode
+  vector; the alias-resolution assertion belongs HERE — add it when wiring lookup.
 - THROW on any decode/encode error — no silent `�` except the single explicit `"replace"`
   path used by `test_russian_crash`.
 
