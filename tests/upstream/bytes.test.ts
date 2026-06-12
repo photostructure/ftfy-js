@@ -47,6 +47,17 @@ describe("test_bytes", () => {
     expect(resultEncoding).toBe("utf-8-variants");
   });
 
+  test("test_russian_crash guess_bytes half", () => {
+    // Port of test_encodings.py::test_russian_crash:
+    // b"\xe8\xed\xe2\xe5\xed\xf2\xe0\xf0\xe8\xe7\xe0\xf6\xe8\xff "
+    // We don't care what the result is, but this shouldn't crash.
+    const thebytes = Uint8Array.from([
+      0xe8, 0xed, 0xe2, 0xe5, 0xed, 0xf2, 0xe0, 0xf0, 0xe8, 0xe7, 0xe0, 0xf6,
+      0xe8, 0xff, 0x20,
+    ]);
+    expect(() => guess_bytes(thebytes)).not.toThrow();
+  });
+
   test("test_incomplete_sequences", () => {
     // b"surrogates: \xed\xa0\x80\xed\xb0\x80 / null: \xc0\x80"
     const testBytes = Uint8Array.from([
