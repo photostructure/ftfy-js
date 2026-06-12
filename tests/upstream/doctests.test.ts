@@ -12,14 +12,14 @@
 //
 // Doctests already covered by other ported suites are NOT duplicated here:
 //   - fix_text / fix_encoding_and_explain(sÃ³, voilÃ) / apply_plan / decode_escapes
-//     / explain_unicode → tests/index-extras.test.ts
+//     / explain_unicode → tests/internal/index-extras.test.ts
 //   - character_width / monospaced_width / display_{ljust,rjust,center}
-//     → tests/formatting.test.ts
-//   - unescape_html(&#xffff; …) charref edges → tests/entities.test.ts
+//     → tests/internal/formatting.test.ts
+//   - unescape_html(&#xffff; …) charref edges → tests/internal/entities.test.ts
 
 import { describe, expect, test, vi } from "vitest";
 
-import { decode } from "../src/codecs/index.js";
+import { decode } from "../../src/codecs/index.js";
 import {
   fix_character_width,
   fix_latin_ligatures,
@@ -29,8 +29,8 @@ import {
   remove_terminal_escapes,
   uncurl_quotes,
   unescape_html,
-} from "../src/fixes.js";
-import { explain_unicode, fix_encoding } from "../src/index.js";
+} from "../../src/fixes.js";
+import { explain_unicode, fix_encoding } from "../../src/index.js";
 
 describe("fixes.py doctests", () => {
   test("unescape_html", () => {

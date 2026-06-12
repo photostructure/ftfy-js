@@ -15,7 +15,7 @@
 
 import { describe, expect, test } from "vitest";
 
-import { badness, is_bad } from "../src/badness.js";
+import { badness, is_bad } from "../../src/badness.js";
 
 // ---------------------------------------------------------------------------
 // badness() — clean text should return 0

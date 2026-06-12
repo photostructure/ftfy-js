@@ -7,9 +7,9 @@
 
 import { describe, expect, test } from "vitest";
 
-import { possible_encoding } from "../src/chardata.js";
-import { fix_surrogates, remove_control_chars } from "../src/fixes.js";
-import { fix_and_explain, fix_encoding, fix_text } from "../src/index.js";
+import { possible_encoding } from "../../src/chardata.js";
+import { fix_surrogates, remove_control_chars } from "../../src/fixes.js";
+import { fix_and_explain, fix_encoding, fix_text } from "../../src/index.js";
 
 describe("test_characters", () => {
   test("test_possible_encoding", () => {

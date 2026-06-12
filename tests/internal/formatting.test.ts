@@ -14,13 +14,13 @@ import {
   display_ljust,
   display_rjust,
   monospaced_width,
-} from "../src/formatting.js";
+} from "../../src/formatting.js";
 import {
   character_width as root_character_width,
   display_ljust as root_display_ljust,
-} from "../src/index.js";
+} from "../../src/index.js";
 
-const REPO_ROOT = fileURLToPath(new URL("..", import.meta.url));
+const REPO_ROOT = fileURLToPath(new URL("../..", import.meta.url));
 
 describe("character_width", () => {
   test.each([
@@ -126,7 +126,7 @@ describe("justification reaches the requested display width", () => {
 describe("wcwidth-tables.ts is deterministic codegen output", () => {
   test("re-running gen_wcwidth.py yields no change", () => {
     const tablePath = new URL(
-      "../src/generated/wcwidth-tables.ts",
+      "../../src/generated/wcwidth-tables.ts",
       import.meta.url,
     );
     const before = readFileSync(tablePath, "utf8");

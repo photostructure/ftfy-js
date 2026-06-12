@@ -10,13 +10,13 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, test } from "vitest";
 
-import { encode } from "../src/codecs/index.js";
+import { encode } from "../../src/codecs/index.js";
 import {
   apply_plan,
   fix_and_explain,
   fix_encoding_and_explain,
   fix_text,
-} from "../src/index.js";
+} from "../../src/index.js";
 
 interface TestCase {
   label: string;
@@ -28,12 +28,12 @@ interface TestCase {
 }
 
 function loadTestData(): TestCase[] {
-  const dir = fileURLToPath(new URL("./test-cases/", import.meta.url));
+  const dir = fileURLToPath(new URL("../test-cases/", import.meta.url));
   const data: TestCase[] = [];
   for (const file of readdirSync(dir)) {
     if (file.endsWith(".json")) {
       const parsed = JSON.parse(
-        readFileSync(new URL(`./test-cases/${file}`, import.meta.url), "utf8"),
+        readFileSync(new URL(`../test-cases/${file}`, import.meta.url), "utf8"),
       ) as TestCase[];
       data.push(...parsed);
     }

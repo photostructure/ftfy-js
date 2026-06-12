@@ -14,9 +14,9 @@ import { fileURLToPath } from "node:url";
 import { beforeAll, describe, expect, test } from "vitest";
 
 const THIS_DIR = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(THIS_DIR, "..");
+const ROOT = path.resolve(THIS_DIR, "..", "..");
 const BIN = path.join(ROOT, "dist", "bin.js");
-const TEST_FILENAME = path.join(THIS_DIR, "face.txt");
+const TEST_FILENAME = path.join(THIS_DIR, "..", "face.txt");
 
 // os.linesep.join(["┒(⌣˛⌣)┎", ""])
 const CORRECT_OUTPUT = ["┒(⌣˛⌣)┎", ""].join(EOL);

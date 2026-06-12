@@ -25,8 +25,8 @@ import {
   UTF8_DETECTOR_RE,
   WIDTH_MAP,
   possible_encoding,
-} from "../src/chardata.js";
-import { bytesToBinary } from "../src/codecs/binary-string.js";
+} from "../../src/chardata.js";
+import { bytesToBinary } from "../../src/codecs/binary-string.js";
 
 describe("possible_encoding", () => {
   // Port of test_possible_encoding: every one of the 256 Latin-1 codepoints is

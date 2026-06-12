@@ -9,8 +9,8 @@ import {
   replace,
   TextFixerConfig,
   type TextFixerConfig as TextFixerConfigType,
-} from "../src/config.js";
-import { TextFixerConfig as RootTextFixerConfig } from "../src/index.js";
+} from "../../src/config.js";
+import { TextFixerConfig as RootTextFixerConfig } from "../../src/index.js";
 
 describe("makeConfig", () => {
   test("returns the Python defaults", () => {

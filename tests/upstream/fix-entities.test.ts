@@ -8,8 +8,8 @@
 
 import { describe, expect, test, vi } from "vitest";
 
-import { unescape_html } from "../src/fixes.js";
-import { fix_text, fix_text_segment } from "../src/index.js";
+import { unescape_html } from "../../src/fixes.js";
+import { fix_text, fix_text_segment } from "../../src/index.js";
 
 describe("test_entities", () => {
   test("test_entities", () => {

@@ -4,7 +4,7 @@
 
 import { describe, expect, test, vi } from "vitest";
 
-import { decode_escapes } from "../src/fixes.js";
+import { decode_escapes } from "../../src/fixes.js";
 import {
   apply_plan,
   explain_unicode,
@@ -12,8 +12,8 @@ import {
   fix_encoding_and_explain,
   fix_file,
   fix_text,
-} from "../src/index.js";
-import { unicodeName } from "../src/unicode-data.js";
+} from "../../src/index.js";
+import { unicodeName } from "../../src/unicode-data.js";
 
 describe("fix_text doctests", () => {
   test("upstream fix_text docstring examples", () => {

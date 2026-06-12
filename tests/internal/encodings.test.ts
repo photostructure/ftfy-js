@@ -13,15 +13,15 @@ import {
   CharmapCodec,
   charmapDecode,
   charmapEncode,
-} from "../src/codecs/charmap.js";
-import { DecodeError, EncodeError } from "../src/codecs/errors.js";
+} from "../../src/codecs/charmap.js";
+import { DecodeError, EncodeError } from "../../src/codecs/errors.js";
 import {
   getSloppyCodec,
   normalizeEncoding,
   REAL_CODECS,
   SLOPPY_CODECS,
-} from "../src/codecs/sloppy.js";
-import { hasUtf16Bom, utf16Decode } from "../src/codecs/utf16.js";
+} from "../../src/codecs/sloppy.js";
+import { hasUtf16Bom, utf16Decode } from "../../src/codecs/utf16.js";
 
 /** Hex string -> Uint8Array, for compact reference vectors. */
 function hex(s: string): Uint8Array {

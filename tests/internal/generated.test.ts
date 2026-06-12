@@ -14,13 +14,13 @@ import {
   REAL_DECODING_HOLES,
   REAL_DECODING_STRINGS,
   SLOPPY_DECODING_STRINGS,
-} from "../src/generated/charmaps.js";
+} from "../../src/generated/charmaps.js";
 import {
   ENCODING_CHARLISTS,
   ENCODING_REGEX_SOURCES,
-} from "../src/generated/encoding-regexes.js";
-import { HTML5_ENTITIES } from "../src/generated/html5-entities.js";
-import { MOJIBAKE_CATEGORIES } from "../src/generated/mojibake-categories.js";
+} from "../../src/generated/encoding-regexes.js";
+import { HTML5_ENTITIES } from "../../src/generated/html5-entities.js";
+import { MOJIBAKE_CATEGORIES } from "../../src/generated/mojibake-categories.js";
 import {
   ALGORITHMIC_NAME_RANGES,
   HANGUL_JAMO_L,
@@ -32,8 +32,8 @@ import {
   HANGUL_T_COUNT,
   UNICODE_CATEGORIES,
   UNICODE_NAMES,
-} from "../src/generated/unicode-names.js";
-import { UTF8_CLUES } from "../src/generated/utf8-clues.js";
+} from "../../src/generated/unicode-names.js";
+import { UTF8_CLUES } from "../../src/generated/utf8-clues.js";
 
 describe("charmaps", () => {
   test("every decode table is exactly 256 entries", () => {
@@ -220,7 +220,7 @@ describe("Unicode-version drift guards", () => {
 
   /** Read `unicodedata.unidata_version: X` out of a generated file's header. */
   function generatedUnidataVersion(relPath: string): string {
-    const file = fileURLToPath(new URL(`../${relPath}`, import.meta.url));
+    const file = fileURLToPath(new URL(`../../${relPath}`, import.meta.url));
     const header = readFileSync(file, "utf8").slice(0, 600);
     const m = header.match(/unidata_version:\s*([0-9.]+)/);
     if (!m) throw new Error(`no unidata_version header in ${relPath}`);

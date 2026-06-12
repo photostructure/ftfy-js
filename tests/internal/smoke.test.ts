@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, test } from "vitest";
 
-import { __version__ } from "../src/index.js";
+import { __version__ } from "../../src/index.js";
 
 /**
  * The upstream python-ftfy release this port pins to. Bumping this is a
@@ -14,7 +14,7 @@ const PINNED_UPSTREAM = "6.3.1";
 /** Parse `__version__ = "x.y.z"` out of the python-ftfy submodule. */
 function pythonSubmoduleVersion(): string {
   const initPy = fileURLToPath(
-    new URL("../python-ftfy/ftfy/__init__.py", import.meta.url),
+    new URL("../../python-ftfy/ftfy/__init__.py", import.meta.url),
   );
   const src = readFileSync(initPy, "utf8");
   const m = src.match(/^__version__\s*=\s*["']([^"']+)["']/m);

@@ -10,7 +10,7 @@
 
 import { describe, expect, test } from "vitest";
 
-import { unescape } from "../src/html-entities.js";
+import { unescape } from "../../src/html-entities.js";
 
 describe("unescape", () => {
   test("returns input unchanged when it contains no '&'", () => {

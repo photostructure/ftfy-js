@@ -7,9 +7,9 @@
 
 import { describe, expect, test } from "vitest";
 
-import { encode } from "../src/codecs/index.js";
-import { IncrementalDecoder } from "../src/codecs/utf8-variants.js";
-import { guess_bytes } from "../src/index.js";
+import { encode } from "../../src/codecs/index.js";
+import { IncrementalDecoder } from "../../src/codecs/utf8-variants.js";
+import { guess_bytes } from "../../src/index.js";
 
 const TEST_ENCODINGS = ["utf-16", "utf-8", "sloppy-windows-1252"];
 
