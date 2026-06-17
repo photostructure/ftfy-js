@@ -1,6 +1,6 @@
 {
   "name": "@photostructure/ftfy",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Fixes mojibake and other Unicode glitches after the fact — a faithful TypeScript port of python-ftfy by Robyn Speer.",
   "keywords": [
     "ftfy",
