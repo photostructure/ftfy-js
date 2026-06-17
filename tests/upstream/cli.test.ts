@@ -68,7 +68,25 @@ function getCommandOutput(
 beforeAll(() => {
   // The CLI tests run against the built bin entry point, like upstream.
   // Always rebuild: a stale dist/ would silently test old code.
-  execFileSync("npm", ["run", "build"], { cwd: ROOT, stdio: "ignore" });
+  //
+  // Run npm's JS entry point (npm_execpath, set by npm when this runs under
+  // `npm test`) with the current node binary. This keeps an argv array, needs
+  // no shell, and sidesteps the Windows trap where npm is `npm.cmd` and
+  // execFileSync("npm", ...) fails with ENOENT. Fall back to a shell only when
+  // the suite is launched outside an npm script (e.g. `npx vitest`).
+  const npmCli = process.env.npm_execpath;
+  if (npmCli && /npm-cli\.js$/.test(npmCli)) {
+    execFileSync(process.execPath, [npmCli, "run", "build"], {
+      cwd: ROOT,
+      stdio: "ignore",
+    });
+  } else {
+    execFileSync("npm", ["run", "build"], {
+      cwd: ROOT,
+      stdio: "ignore",
+      shell: true,
+    });
+  }
 }, 60_000);
 
 describe("cli", () => {
